@@ -39,6 +39,9 @@ h1{font-size:27px;margin:8px 0 0}h1 span{color:var(--gold)}
 .top button.go{width:100%;padding:11px;border:0;border-radius:8px;background:var(--gold);font-weight:bold;font-size:15px}
 .tp{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--line);cursor:pointer}
 .tp small{color:var(--mute);display:block}.tp .pc{color:var(--green);font-weight:bold;white-space:nowrap}
+.acca{background:linear-gradient(#16281f,#10301f);border:2px solid var(--green);border-radius:10px;padding:12px;margin-bottom:14px}
+.acca h2{margin:0 0 4px;font-size:20px;color:var(--green)}
+.acca .tot{display:flex;justify-content:space-between;font-weight:bold;padding-top:8px;border-top:1px solid var(--line);margin-top:4px}
 footer{color:var(--mute);font-size:12.5px;margin:26px 0}
 </style>
 </head>
@@ -52,6 +55,12 @@ footer{color:var(--mute);font-size:12.5px;margin:26px 0}
 
   <!-- MONEY SPOT 1: ADS. Replace this box with your AdSense code -->
   <div class="ad">Ad space (paste Google AdSense code here)</div>
+
+  <div class="acca">
+    <h2>Free 5 Odds of the Day</h2>
+    <div id="accabody"><button class="go" style="width:100%;padding:11px;border:0;border-radius:8px;background:var(--green);font-weight:bold;font-size:15px" onclick="loadAcca()">Get today's 5 odds (free)</button></div>
+    <small style="color:var(--mute)">Estimated odds from our model. Check your bookmaker for the real prices. No pick is certain.</small>
+  </div>
 
   <div class="top" id="top">
     <h2>Top picks of the day</h2>
@@ -168,6 +177,7 @@ async function load(){
   $("note").textContent = "Live data for " + ymd(day) + ". Tap a match to load its predictions.";
   $("list").textContent = "Loading matches...";
   $("topbody").innerHTML = '<button class="go" onclick="loadTop()">Show top picks</button>';
+  $("accabody").querySelector("button") || ($("accabody").innerHTML = '<button class="go" style="width:100%;padding:11px;border:0;border-radius:8px;background:var(--green);font-weight:bold;font-size:15px" onclick="loadAcca()">Get today\'s 5 odds (free)</button>');
   try{
     let fx = await api("/fixtures?date=" + ymd(day) + "&timezone=" + CONFIG.TIMEZONE);
     const L = CONFIG.LEAGUES;
@@ -213,6 +223,33 @@ async function openMatch(id){
       ${CONFIG.AFFILIATE_LINK ? `<a class="btn" href="${CONFIG.AFFILIATE_LINK}" target="_blank" rel="noopener sponsored">${CONFIG.AFFILIATE_NAME}</a>` : ""}`;
     d.dataset.done = 1;
   }catch(e){ d.textContent = "Could not load prediction: " + e.message; }
+}
+
+/* ---------- free 5 odds slip ---------- */
+async function loadAcca(){
+  const ab = $("accabody"); ab.textContent = "Building the slip...";
+  const cands = [];
+  for(const f of FIX.slice(0, 15)){
+    try{
+      const p = await getPred(f.fixture.id);
+      if(!p || !p.teams) continue;
+      const [lh, la] = xg(p), s = simulate(lh, la, 3000);
+      const hn = f.teams.home.name, an = f.teams.away.name;
+      const opts = [[hn + " or draw (1X)", s.dc1x], [an + " or draw (X2)", s.dcx2], ["Over 1.5 goals", s.o15], ["Under 3.5 goals", 100 - s.o35], [hn + " to win", s.h], [an + " to win", s.a], ["GG", s.gg]].filter(o => o[1] >= 60 && o[1] <= 83);
+      opts.sort((x, y) => y[1] - x[1]);
+      if(opts.length) cands.push({f, label: opts[0][0], p: opts[0][1]});
+    }catch(e){ ab.textContent = "Could not build the slip: " + e.message; return; }
+  }
+  cands.sort((a, b) => b.p - a.p);
+  const pick = []; let odds = 1, prob = 1;
+  for(const c of cands){ if(odds >= 5) break; pick.push(c); odds *= 100 / c.p; prob *= c.p / 100; }
+  if(!pick.length){ ab.textContent = "Not enough strong picks for this day. Try another day."; return; }
+  ab.innerHTML = pick.map(c => `<div class="tp" onclick="jumpTo(${c.f.fixture.id})">
+    <span><b>${c.f.teams.home.name} vs ${c.f.teams.away.name}</b><small>${c.label}</small></span>
+    <span class="pc">${(100 / c.p).toFixed(2)}</span></div>`).join("")
+    + `<div class="tot"><span>Total odds</span><span style="color:var(--gold)">${odds.toFixed(2)}</span></div>
+    <small style="color:var(--mute)">Estimated chance of all ${pick.length} winning: about ${Math.round(prob * 100)}%</small>`
+    + (CONFIG.AFFILIATE_LINK ? `<a class="btn" href="${CONFIG.AFFILIATE_LINK}" target="_blank" rel="noopener sponsored">Place this slip</a>` : "");
 }
 
 /* ---------- top picks ---------- */
