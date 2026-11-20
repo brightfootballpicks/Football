@@ -209,7 +209,7 @@ async function openMatch(id){
     const p = await getPred(id);
     if(!p || !p.teams) { d.textContent = "No prediction available for this match."; return; }
     const [lh, la] = xg(p), s = simulate(lh, la);
-    const hn = p.teams.home.name, an = p.teams.away.name;
+    const hn = p.teams.home.name, an = p.teams.away.name, bp = bestPick(p, s, lh, la);
     d.innerHTML = `
       <div class="bar"><div class="b1" style="width:${s.h}%">${s.h}%</div><div class="bx" style="width:${s.d}%">${s.d}%</div><div class="b2" style="width:${s.a}%">${s.a}%</div></div>
       <div class="lbl"><span>${hn} win</span><span>Draw</span><span>${an} win</span></div>
@@ -220,21 +220,43 @@ async function openMatch(id){
       <div class="sec">Special markets</div>
       <div class="chips">${chip(hn + " win either half", s.hh)}${chip(an + " win either half", s.ah)}${chip(hn + " 1UP (2 goals ahead)", s.u1)}${chip(an + " 1UP (2 goals ahead)", s.u2)}</div>
       <div class="sec">Most likely correct scores</div>
-      <div class="chips">${s.cs.map(c => `<span class="chip">${c[0]}: <b>${c[1]}%</b></span>`).join("")}</div>
-      <div class="best"><b>Our pick:</b> ${(p.predictions && p.predictions.advice) || "See the markets above"}<br>
-      <small>Expected goals: ${lh.toFixed(1)} - ${la.toFixed(1)}</small></div>
+      <div class="chips">${s.cs.map((c, i) => `<span class="chip ${i === 0 ? "hi" : ""}">${c[0]} <b>${c[1]}%</b></span>`).join("")}</div>
+      <div class="best" style="font-size:16px"><b>FINAL PICK: ${bp[0]}</b><br>
+      Confidence: <b style="color:var(--green)">${bp.conf} (${bp[1]}%)</b><br>
+      <small>${bp[2]}</small></div>
       ${CONFIG.AFFILIATE_LINK ? `<a class="btn" href="${CONFIG.AFFILIATE_LINK}" target="_blank" rel="noopener sponsored">${CONFIG.AFFILIATE_NAME}</a>` : ""}`;
     d.dataset.done = 1;
   }catch(e){ d.textContent = "Could not load prediction: " + e.message; }
 }
 
 /* ---------- free 5 odds slip ---------- */
+function pickList(p, s, lh, la){
+  const hn = p.teams.home.name, an = p.teams.away.name, t = (lh + la).toFixed(1);
+  const fm = (p.comparison && p.comparison.form) || {}, fh = fm.home || "-", fa = fm.away || "-";
+  const o = [
+    [hn + " to win", s.h, `${hn} are expected to score ${lh.toFixed(1)} goals against ${la.toFixed(1)} for ${an}, and their form rating is ${fh} against ${fa}.`],
+    [an + " to win", s.a, `${an} are expected to score ${la.toFixed(1)} goals against ${lh.toFixed(1)} for ${hn}, and their form rating is ${fa} against ${fh}.`],
+    [hn + " or draw (1X)", s.dc1x, `${hn} are unlikely to lose: they carry the stronger expected goals (${lh.toFixed(1)} against ${la.toFixed(1)}) and form of ${fh} against ${fa}.`],
+    [an + " or draw (X2)", s.dcx2, `${an} are unlikely to lose: they carry the stronger expected goals (${la.toFixed(1)} against ${lh.toFixed(1)}) and form of ${fa} against ${fh}.`],
+    ["Over 1.5 goals", s.o15, `Both teams combine for ${t} expected goals, so at least 2 goals is very likely.`],
+    ["Over 2.5 goals", s.o25, `With ${t} expected goals between the two sides, an open game with 3 or more goals is likely.`],
+    ["Under 3.5 goals", 100 - s.o35, `Only ${t} expected goals in total, so 4 or more goals would be unusual.`],
+    ["Under 2.5 goals", s.u25, `Only ${t} expected goals in total, which points to a tight, low-scoring game.`],
+    ["GG (both teams score)", s.gg, `Both attacks should find the net: ${lh.toFixed(1)} expected goals for ${hn} and ${la.toFixed(1)} for ${an}.`]
+  ];
+  return o.sort((a, b) => b[1] - a[1]);
+}
+function bestPick(p, s, lh, la){
+  const l = pickList(p, s, lh, la), b = l.find(x => x[1] <= 90) || l[0];
+  b.conf = b[1] >= 70 ? "High" : b[1] >= 58 ? "Medium" : "Low";
+  return b;
+}
 function poolFix(){
   const n = {};
   return FIX.filter(f => (n[f.league.id] = (n[f.league.id] || 0) + 1) <= 2).slice(0, 30);
 }
 async function loadAcca(){
-  const ab = $("accabody"), key = "acca_" + ymd(day);
+  const ab = $("accabody"), key = "acca2_" + ymd(day);
   try{ const sv = localStorage.getItem(key); if(sv){ ab.innerHTML = sv; return; } }catch(e){}
   ab.textContent = "Building the slip...";
   const cands = [];
@@ -243,10 +265,8 @@ async function loadAcca(){
       const p = await getPred(f.fixture.id);
       if(!p || !p.teams) continue;
       const [lh, la] = xg(p), s = simulate(lh, la, 3000);
-      const hn = f.teams.home.name, an = f.teams.away.name;
-      const opts = [[hn + " or draw (1X)", s.dc1x], [an + " or draw (X2)", s.dcx2], ["Over 1.5 goals", s.o15], ["Under 3.5 goals", 100 - s.o35], [hn + " to win", s.h], [an + " to win", s.a], ["GG", s.gg]].filter(o => o[1] >= 60 && o[1] <= 83);
-      opts.sort((x, y) => y[1] - x[1]);
-      if(opts.length) cands.push({f, label: opts[0][0], p: opts[0][1]});
+      const opts = pickList(p, s, lh, la).filter(o => o[1] >= 60 && o[1] <= 83);
+      if(opts.length) cands.push({f, label: opts[0][0], p: opts[0][1], why: opts[0][2]});
     }catch(e){ ab.textContent = "Could not build the slip: " + e.message; return; }
   }
   cands.sort((a, b) => b.p - a.p);
@@ -254,7 +274,7 @@ async function loadAcca(){
   for(const c of cands){ if(odds >= 5) break; pick.push(c); odds *= 100 / c.p; prob *= c.p / 100; }
   if(!pick.length){ ab.textContent = "Not enough strong picks for this day. Try another day."; return; }
   ab.innerHTML = pick.map(c => `<div class="tp" onclick="jumpTo(${c.f.fixture.id})">
-    <span><b>${c.f.teams.home.name} vs ${c.f.teams.away.name}</b><small>${c.label}</small></span>
+    <span><b>${c.f.teams.home.name} vs ${c.f.teams.away.name}</b><small><b style="color:var(--gold)">${c.label}</b> - ${c.p >= 70 ? "High" : "Medium"} confidence (${c.p}%)<br>${c.why}</small></span>
     <span class="pc">${(100 / c.p).toFixed(2)}</span></div>`).join("")
     + `<div class="tot"><span>Total odds</span><span style="color:var(--gold)">${odds.toFixed(2)}</span></div>
     <small style="color:var(--mute)">Estimated chance of all ${pick.length} winning: about ${Math.round(prob * 100)}%</small>`
