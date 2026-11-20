@@ -4,216 +4,247 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Football Predictions Picks</title>
-<!-- OPTIONAL: paste your Google AdSense script tag here, inside <head> -->
+<!-- OPTIONAL: paste your Google AdSense script tag here -->
 <style>
-:root{--bg:#0e1a14;--card:#16281f;--line:#264535;--text:#eef5f0;--mute:#9db5a6;--gold:#f2c94c;--green:#3ddc84}
+:root{--bg:#0e1a14;--card:#16281f;--line:#264535;--text:#e8f3ec;--mute:#8fa89a;--gold:#e6b800;--green:#2ecc71}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Georgia,"Times New Roman",serif;line-height:1.5}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,sans-serif}
 .wrap{max-width:720px;margin:0 auto;padding:16px}
-h1{font-size:27px;margin:8px 0 0;letter-spacing:-.5px}
-h1 span{color:var(--gold)}
+h1{font-size:27px;margin:8px 0 0}h1 span{color:var(--gold)}
 .sub{color:var(--mute);margin:2px 0 14px;font-size:15px}
 .tabs{display:flex;gap:8px;margin-bottom:14px}
-.tabs button{flex:1;padding:10px;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:10px;font:inherit;cursor:pointer}
-.tabs button.on{background:var(--gold);color:#1a1a1a;border-color:var(--gold);font-weight:bold}
-.note{background:#3a2f12;border:1px solid #6b5518;color:#f6e3a4;padding:10px 12px;border-radius:10px;font-size:14px;margin-bottom:14px}
-.ad{border:1px dashed var(--line);color:var(--mute);text-align:center;padding:18px 8px;border-radius:10px;margin:14px 0;font-size:13px}
-.league{color:var(--mute);font-size:13px;margin:18px 0 6px}
-.match{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
-.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;width:100%;background:none;border:0;color:inherit;font:inherit;text-align:left}
-.teams{font-weight:bold}
-.time{color:var(--mute);font-size:14px;white-space:nowrap}
-.det{padding:0 14px 14px;display:none}
-.match.open .det{display:block}
-.bar{display:flex;height:26px;border-radius:6px;overflow:hidden;margin:8px 0;font-size:13px;font-weight:bold;color:#102016}
+.tabs button{flex:1;padding:10px;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:8px;font-size:15px}
+.tabs button.on{background:var(--gold);color:#1a1a1a;font-weight:bold}
+.note{background:#3a2f12;border:1px solid #6b5518;color:#f1d98a;padding:8px;border-radius:8px;font-size:13px;margin-bottom:12px}
+.ad{border:1px dashed var(--line);color:var(--mute);padding:14px;text-align:center;margin:12px 0;border-radius:8px;font-size:13px}
+.league{color:var(--mute);font-size:13px;margin:18px 0 6px;text-transform:uppercase}
+.match{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer;gap:10px}
+.teams{font-weight:bold}.time{color:var(--mute);font-size:14px;white-space:nowrap}
+.det{padding:0 14px 14px;display:none}.match.open .det{display:block}
+.bar{display:flex;height:26px;border-radius:6px;overflow:hidden;font-size:12px;font-weight:bold;color:#111}
 .bar div{display:flex;align-items:center;justify-content:center}
 .b1{background:var(--green)}.bx{background:#cdd8d1}.b2{background:var(--gold)}
-.lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--mute)}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
-.chip{border:1px solid var(--line);padding:4px 10px;border-radius:20px;font-size:13px}
-.chip b{color:var(--gold)}
-.best{background:#10301f;border:1px solid var(--green);padding:10px;border-radius:10px;margin-top:8px}
-.btn{display:block;text-align:center;background:var(--green);color:#0b1a11;padding:12px;border-radius:10px;font-weight:bold;text-decoration:none;margin-top:10px}
-.promo{background:var(--card);border:1px solid var(--gold);border-radius:12px;padding:14px;margin:18px 0}
+.lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--mute);margin:3px 0 10px}
+.sec{color:var(--gold);font-size:13px;font-weight:bold;margin:12px 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);padding:5px 10px;border-radius:14px;font-size:13px}
+.chip b{color:var(--gold)}.chip.hi{border-color:var(--green)}.chip.hi b{color:var(--green)}
+.best{background:#10301f;border:1px solid var(--green);padding:10px;border-radius:8px;margin-top:12px;font-size:14px}
+.btn{display:block;text-align:center;background:var(--gold);color:#1a1a1a;font-weight:bold;padding:10px;border-radius:8px;margin-top:10px;text-decoration:none}
+.promo{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:14px 0}
 .promo a{color:var(--gold)}
-.top{background:var(--card);border:1px solid var(--gold);border-radius:12px;padding:14px;margin-bottom:14px}
+.top{background:var(--card);border:1px solid var(--gold);border-radius:10px;padding:12px;margin-bottom:14px}
 .top h2{margin:0 0 8px;font-size:19px}
-.top button.go{width:100%;padding:11px;border:0;border-radius:10px;background:var(--gold);color:#1a1a1a;font:inherit;font-weight:bold;cursor:pointer}
-.tp{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
-.tp small{color:var(--mute);display:block}
-.tp .pc{color:var(--green);font-weight:bold;white-space:nowrap}
-footer{color:var(--mute);font-size:12.5px;margin:26px 0 10px;border-top:1px solid var(--line);padding-top:14px}
+.top button.go{width:100%;padding:11px;border:0;border-radius:8px;background:var(--gold);font-weight:bold;font-size:15px}
+.tp{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--line);cursor:pointer}
+.tp small{color:var(--mute);display:block}.tp .pc{color:var(--green);font-weight:bold;white-space:nowrap}
+footer{color:var(--mute);font-size:12.5px;margin:26px 0}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Football Predictions <span>Picks</span></h1>
-  <p class="sub">Daily football predictions. Tap any match to see the picks.</p>
+  <p class="sub">Daily football predictions. Tap any match to see all markets.</p>
 
   <div class="tabs" id="tabs"></div>
   <div class="note" id="note"></div>
 
-  <!-- MONEY SPOT 1: ADS. Replace this box with your AdSense ad code. -->
+  <!-- MONEY SPOT 1: ADS. Replace this box with your AdSense code -->
   <div class="ad">Ad space (paste Google AdSense code here)</div>
 
   <div class="top" id="top">
     <h2>Top picks of the day</h2>
-    <div id="topbody"><button class="go" onclick="loadTop()">Show the 5 strongest picks</button>
-    <small style="color:var(--mute)">Checks up to 20 matches, so it uses up to 20 of your daily API requests.</small></div>
+    <div id="topbody"><button class="go" onclick="loadTop()">Show top picks</button></div>
+    <small style="color:var(--mute)">Checks up to 15 matches (uses 15 API requests, saved after first load).</small>
   </div>
 
   <div id="list">Loading matches...</div>
 
-  <!-- MONEY SPOT 2: YOUR OWN PRODUCTS. Set SELAR_LINK below. -->
+  <!-- MONEY SPOT 2: YOUR OWN PRODUCTS. Set SELAR_LINK below -->
   <div class="promo" id="promo" style="display:none"></div>
 
   <!-- MONEY SPOT 1 again: second ad -->
   <div class="ad">Ad space (paste Google AdSense code here)</div>
 
   <footer>
-    Football Predictions Picks is created and owned by Bright. Predictions are probabilities, not guaranteed wins. No one can promise a winning bet.
-    Only 18+. Bet with money you can afford to lose. If gambling stops being fun, stop.
+    Football Predictions Picks. Predictions are statistical estimates, not guarantees.
+    Only 18+. Bet with money you can afford to lose.
   </footer>
 </div>
 
 <script>
 /* ======== SETTINGS: this is the only part you need to edit ======== */
 const CONFIG = {
-  API_KEY: "8b26b15fc4c15d87694685e8c9c3a2c7",          // 1. Paste your API-Football key here (from api-football.com). Leave empty to see SAMPLE data.
-  AFFILIATE_LINK: "",   // 2. Paste your bookmaker affiliate link here (earns you money when people sign up)
+  API_KEY: "8b26b15fc4c15d87694685e8c9c3a2c7",
+  AFFILIATE_LINK: "",   // paste your bookmaker affiliate link
   AFFILIATE_NAME: "Bet on this match",
-  SELAR_LINK: "",       // 3. Paste a link to your Selar ebook or guide here
+  SELAR_LINK: "",       // paste a link to your Selar store
   SELAR_TEXT: "Get my free guide and ebooks on Selar",
-  // League IDs shown: Premier League, Championship, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Conference League, Eredivisie, Portugal, Turkey, Saudi, MLS, Brazil, Argentina, Nigeria NPFL, Egypt, CAF Champions League, Africa Cup of Nations
-  LEAGUES: [39,40,140,135,78,61,2,3,848,88,94,203,307,253,71,128,332,233,12,6]
+  TIMEZONE: "Africa/Lagos",
+  // Priority order: Premier League, Championship, La Liga, Serie A, Bundesliga, Ligue 1,
+  // Champions League, Europa League, Conference League, Eredivisie, Primeira Liga, Super Lig,
+  // Belgium, Scotland, Bundesliga 2, La Liga 2, Serie B, Ligue 2, League One, FA Cup
+  LEAGUES: [39,40,140,135,78,61,2,3,848,88,94,203,144,179,79,141,136,62,41,45]
 };
 /* ================================================================== */
 
 const API = "https://v3.football.api-sports.io";
-const DEMO = !CONFIG.API_KEY;
 const $ = id => document.getElementById(id);
-const pct = s => parseInt(String(s||"0"),10)||0;
 let day = 0, FIX = [];
-const cache = {};
-async function getPred(id){
-  if(cache[id]) return cache[id];
-  const p = DEMO ? DEMO_PRED[id] : ((await api("/predictions?fixture="+id))[0]||{}).predictions;
-  if(p && p.percent) cache[id]=p;
-  return p;
-}
 
-function ymd(offset){
-  const d = new Date(); d.setDate(d.getDate()+offset);
-  return d.toISOString().slice(0,10);
-}
 async function api(path){
-  const r = await fetch(API+path,{headers:{"x-apisports-key":CONFIG.API_KEY}});
-  if(!r.ok) throw new Error("API error "+r.status);
+  const r = await fetch(API + path, {headers:{"x-apisports-key":CONFIG.API_KEY}});
+  if(!r.ok) throw new Error("API error " + r.status);
   const j = await r.json();
-  return j.response||[];
+  if(j.errors && Object.keys(j.errors).length && !Array.isArray(j.errors)) throw new Error(Object.values(j.errors)[0]);
+  return j.response || [];
+}
+function ymd(o){
+  const d = new Date(); d.setDate(d.getDate() + o);
+  return d.toLocaleDateString("en-CA", {timeZone: CONFIG.TIMEZONE});
+}
+const num = s => parseFloat(s) || 0;
+
+/* ---------- prediction data (cached to save API requests) ---------- */
+const mem = {};
+async function getPred(id){
+  if(mem[id]) return mem[id];
+  try{ const c = localStorage.getItem("fp_" + id); if(c){ mem[id] = JSON.parse(c); return mem[id]; } }catch(e){}
+  const r = (await api("/predictions?fixture=" + id))[0];
+  if(r){ mem[id] = r; try{ localStorage.setItem("fp_" + id, JSON.stringify(r)); }catch(e){} }
+  return r;
 }
 
-const DEMO_FIX = [
-  {fixture:{id:1,date:new Date().toISOString()},league:{id:39,name:"Premier League"},teams:{home:{name:"Arsenal"},away:{name:"Chelsea"}}},
-  {fixture:{id:2,date:new Date().toISOString()},league:{id:140,name:"La Liga"},teams:{home:{name:"Real Madrid"},away:{name:"Sevilla"}}},
-  {fixture:{id:3,date:new Date().toISOString()},league:{id:332,name:"NPFL Nigeria"},teams:{home:{name:"Enyimba"},away:{name:"Rivers United"}}}
-];
-const DEMO_PRED = {
-  1:{percent:{home:"48%",draw:"29%",away:"23%"},under_over:"+2.5",advice:"Double chance: Arsenal or draw",winner:{name:"Arsenal"}},
-  2:{percent:{home:"72%",draw:"20%",away:"8%"},under_over:"+2.5",advice:"Real Madrid to win",winner:{name:"Real Madrid"}},
-  3:{percent:{home:"45%",draw:"35%",away:"20%"},under_over:"-2.5",advice:"Double chance: Enyimba or draw",winner:{name:"Enyimba"}}
-};
+/* ---------- model: expected goals + simulation ---------- */
+function xg(p){
+  const h = p.teams.home.league.goals, a = p.teams.away.league.goals;
+  const hf = num(h.for.average.home), ha = num(h.against.average.home);
+  const af = num(a.for.average.away), aa = num(a.against.average.away);
+  const lh = (hf && aa) ? (hf + aa) / 2 : 1.4;
+  const la = (af && ha) ? (af + ha) / 2 : 1.1;
+  return [Math.min(Math.max(lh, .3), 4), Math.min(Math.max(la, .3), 4)];
+}
+function pois(l){ const L = Math.exp(-l); let k = 0, p = 1; do{ k++; p *= Math.random(); }while(p > L); return k - 1; }
+const minute = () => Math.random() < .45 ? Math.random() * 45 : 45 + Math.random() * 45;
 
-const TOPBTN = $("topbody").innerHTML;
-async function loadTop(){
-  const tb = $("topbody");
-  tb.textContent = "Checking matches...";
-  const rows = [];
-  for(const f of FIX.slice(0,20)){
-    try{
-      const p = await getPred(f.fixture.id);
-      if(!p || !p.percent) continue;
-      const h=pct(p.percent.home), x=pct(p.percent.draw), a=pct(p.percent.away);
-      const top = Math.max(h,x,a);
-      rows.push({f, p, top});
-    }catch(e){ tb.textContent = "Could not load picks: "+e.message; return; }
+function simulate(lh, la, N = 6000){
+  const c = {h:0,d:0,a:0,gg:0,o15:0,o25:0,o35:0,hh:0,ah:0,u1:0,u2:0,cs:{}};
+  for(let i = 0; i < N; i++){
+    const gh = pois(lh), ga = pois(la), ev = [];
+    for(let k = 0; k < gh; k++) ev.push([minute(), 1]);
+    for(let k = 0; k < ga; k++) ev.push([minute(), -1]);
+    ev.sort((x, y) => x[0] - y[0]);
+    let d = 0, up1 = 0, up2 = 0, h1 = 0, a1 = 0, h2 = 0, a2 = 0;
+    for(const [m, s] of ev){
+      d += s; if(d >= 2) up1 = 1; if(d <= -2) up2 = 1;
+      if(m < 45){ s > 0 ? h1++ : a1++; } else { s > 0 ? h2++ : a2++; }
+    }
+    gh > ga ? c.h++ : gh < ga ? c.a++ : c.d++;
+    if(gh && ga) c.gg++;
+    const t = gh + ga; if(t > 1) c.o15++; if(t > 2) c.o25++; if(t > 3) c.o35++;
+    if(h1 > a1 || h2 > a2) c.hh++;
+    if(a1 > h1 || a2 > h2) c.ah++;
+    c.u1 += up1; c.u2 += up2;
+    const k = gh + "-" + ga; c.cs[k] = (c.cs[k] || 0) + 1;
   }
-  rows.sort((a,b)=>b.top-a.top);
-  const best = rows.slice(0,5);
-  if(!best.length){ tb.textContent = "No predictions available yet for today's matches."; return; }
-  tb.innerHTML = best.map((r,i)=>`<div class="tp" onclick="jumpTo(${r.f.fixture.id})">
-    <span><b>${r.f.teams.home.name} vs ${r.f.teams.away.name}</b><small>${r.p.advice||"No clear pick"}</small></span>
-    <span class="pc">${r.top}%</span></div>`).join("")
-    + '<small style="color:var(--mute)">Percent is the chance of the most likely result. Probabilities, not guarantees.</small>';
+  const P = x => Math.round(100 * x / N);
+  const cs = Object.entries(c.cs).sort((x, y) => y[1] - x[1]).slice(0, 4).map(e => [e[0], P(e[1])]);
+  const h = P(c.h), d = P(c.d), a = P(c.a);
+  return {h, d, a, dc1x: h + d, dcx2: d + a, dc12: h + a, gg: P(c.gg), ng: 100 - P(c.gg),
+    o15: P(c.o15), o25: P(c.o25), u25: 100 - P(c.o25), o35: P(c.o35),
+    hh: P(c.hh), ah: P(c.ah), u1: P(c.u1), u2: P(c.u2), cs};
 }
-function jumpTo(id){
-  const m=$("m"+id); if(!m) return;
-  if(!m.classList.contains("open")) openMatch(id);
-  m.scrollIntoView({behavior:"smooth",block:"center"});
-}
+const chip = (t, v) => `<span class="chip ${v >= 60 ? "hi" : ""}">${t}: <b>${v}%</b></span>`;
+
+/* ---------- match list ---------- */
 function buildTabs(){
-  const names = ["Today","Tomorrow","Day after"];
-  $("tabs").innerHTML = names.map((n,i)=>`<button class="${i===day?"on":""}" onclick="setDay(${i})">${n}</button>`).join("");
+  const names = ["Today", "Tomorrow", "Day after"];
+  $("tabs").innerHTML = names.map((n, i) => `<button class="${i === day ? "on" : ""}" onclick="setDay(${i})">${n}</button>`).join("");
 }
-function setDay(i){ day=i; buildTabs(); load(); }
+function setDay(i){ day = i; buildTabs(); load(); }
 
 async function load(){
-  $("note").innerHTML = DEMO
-    ? "SAMPLE DATA. Add your API key in the settings at the top of the code to see real matches."
-    : "Live data. Tap a match to load its prediction.";
+  $("note").textContent = "Live data for " + ymd(day) + ". Tap a match to load its predictions.";
   $("list").textContent = "Loading matches...";
+  $("topbody").innerHTML = '<button class="go" onclick="loadTop()">Show top picks</button>';
   try{
-    let fx = DEMO ? DEMO_FIX : (await api("/fixtures?date="+ymd(day))).filter(f=>CONFIG.LEAGUES.includes(f.league.id));
-    if(!fx.length){ $("list").textContent = "No matches in the selected leagues for this day. Try another day."; return; }
+    let fx = await api("/fixtures?date=" + ymd(day) + "&timezone=" + CONFIG.TIMEZONE);
+    const L = CONFIG.LEAGUES;
+    fx = fx.filter(f => L.includes(f.league.id));
+    if(!fx.length){ $("list").textContent = "No matches from our leagues on this day."; FIX = []; return; }
+    fx.sort((a, b) => L.indexOf(a.league.id) - L.indexOf(b.league.id) || new Date(a.fixture.date) - new Date(b.fixture.date));
     FIX = fx;
-    $("topbody").innerHTML = TOPBTN;
-    fx.sort((a,b)=>a.league.name.localeCompare(b.league.name)||new Date(a.fixture.date)-new Date(b.fixture.date));
-    let html="", last="";
-    fx.forEach(f=>{
-      if(f.league.name!==last){ last=f.league.name; html+=`<div class="league">${f.league.name}</div>`; }
-      const t = new Date(f.fixture.date).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
-      html+=`<div class="match" id="m${f.fixture.id}">
-        <button class="row" onclick="openMatch(${f.fixture.id})"><span class="teams">${f.teams.home.name} vs ${f.teams.away.name}</span><span class="time">${t}</span></button>
+    let html = "", last = null;
+    for(const f of fx){
+      if(f.league.id !== last){ html += `<div class="league">${f.league.country} - ${f.league.name}</div>`; last = f.league.id; }
+      const t = new Date(f.fixture.date).toLocaleTimeString("en-GB", {hour:"2-digit", minute:"2-digit", timeZone: CONFIG.TIMEZONE});
+      html += `<div class="match" id="m${f.fixture.id}"><div class="row" onclick="openMatch(${f.fixture.id})">
+        <span class="teams">${f.teams.home.name} vs ${f.teams.away.name}</span><span class="time">${t}</span></div>
         <div class="det" id="d${f.fixture.id}"></div></div>`;
-    });
+    }
     $("list").innerHTML = html;
-  }catch(e){
-    $("list").textContent = "Could not load matches: "+e.message+". Check your API key and plan.";
-  }
+  }catch(e){ $("list").textContent = "Could not load matches: " + e.message; }
 }
 
 async function openMatch(id){
-  const m = $("m"+id), d = $("d"+id);
+  const m = $("m" + id), d = $("d" + id);
   m.classList.toggle("open");
   if(!m.classList.contains("open") || d.dataset.done) return;
   d.textContent = "Loading prediction...";
   try{
     const p = await getPred(id);
-    if(!p || !p.percent){ d.textContent="No prediction available for this match yet."; return; }
-    const h=pct(p.percent.home), x=pct(p.percent.draw), a=pct(p.percent.away);
-    const top=Math.max(h,x,a);
-    const conf = top>=60?"High":top>=45?"Medium":"Low";
-    const ou = String(p.under_over||"");
-    const ouTxt = ou ? (ou.startsWith("-")?"Under ":"Over ")+ou.replace(/[+-]/,"")+" goals" : "";
+    if(!p || !p.teams) { d.textContent = "No prediction available for this match."; return; }
+    const [lh, la] = xg(p), s = simulate(lh, la);
+    const hn = p.teams.home.name, an = p.teams.away.name;
     d.innerHTML = `
-      <div class="bar"><div class="b1" style="width:${h}%">${h}%</div><div class="bx" style="width:${x}%">${x}%</div><div class="b2" style="width:${a}%">${a}%</div></div>
-      <div class="lbl"><span>Home win</span><span>Draw</span><span>Away win</span></div>
-      <div class="chips">
-        <span class="chip">Home or draw (1X): <b>${Math.min(h+x,100)}%</b></span>
-        <span class="chip">Away or draw (X2): <b>${Math.min(a+x,100)}%</b></span>
-        <span class="chip">Home or away (12): <b>${Math.min(h+a,100)}%</b></span>
-        ${ouTxt?`<span class="chip">Goals: <b>${ouTxt}</b></span>`:""}
-        <span class="chip">Confidence: <b>${conf}</b></span>
-      </div>
-      <div class="best"><b>Our pick:</b> ${p.advice||"No clear pick"}</div>
-      ${CONFIG.AFFILIATE_LINK?`<a class="btn" href="${CONFIG.AFFILIATE_LINK}" target="_blank" rel="sponsored noopener">${CONFIG.AFFILIATE_NAME}</a>`:""}`;
-    d.dataset.done=1;
-  }catch(e){ d.textContent="Could not load prediction: "+e.message; }
+      <div class="bar"><div class="b1" style="width:${s.h}%">${s.h}%</div><div class="bx" style="width:${s.d}%">${s.d}%</div><div class="b2" style="width:${s.a}%">${s.a}%</div></div>
+      <div class="lbl"><span>${hn} win</span><span>Draw</span><span>${an} win</span></div>
+      <div class="sec">Double chance</div>
+      <div class="chips">${chip("1X", s.dc1x)}${chip("X2", s.dcx2)}${chip("12", s.dc12)}</div>
+      <div class="sec">Goals</div>
+      <div class="chips">${chip("GG (both score)", s.gg)}${chip("NG", s.ng)}${chip("Over 1.5", s.o15)}${chip("Over 2.5", s.o25)}${chip("Under 2.5", s.u25)}${chip("Over 3.5", s.o35)}</div>
+      <div class="sec">Special markets</div>
+      <div class="chips">${chip(hn + " win either half", s.hh)}${chip(an + " win either half", s.ah)}${chip(hn + " 1UP (2 goals ahead)", s.u1)}${chip(an + " 1UP (2 goals ahead)", s.u2)}</div>
+      <div class="sec">Most likely correct scores</div>
+      <div class="chips">${s.cs.map(c => `<span class="chip">${c[0]}: <b>${c[1]}%</b></span>`).join("")}</div>
+      <div class="best"><b>Our pick:</b> ${(p.predictions && p.predictions.advice) || "See the markets above"}<br>
+      <small>Expected goals: ${lh.toFixed(1)} - ${la.toFixed(1)}</small></div>
+      ${CONFIG.AFFILIATE_LINK ? `<a class="btn" href="${CONFIG.AFFILIATE_LINK}" target="_blank" rel="noopener sponsored">${CONFIG.AFFILIATE_NAME}</a>` : ""}`;
+    d.dataset.done = 1;
+  }catch(e){ d.textContent = "Could not load prediction: " + e.message; }
+}
+
+/* ---------- top picks ---------- */
+async function loadTop(){
+  const tb = $("topbody"); tb.textContent = "Checking matches...";
+  const rows = [];
+  for(const f of FIX.slice(0, 15)){
+    try{
+      const p = await getPred(f.fixture.id);
+      if(!p || !p.teams) continue;
+      const [lh, la] = xg(p), s = simulate(lh, la, 3000);
+      const opts = [[f.teams.home.name + " to win", s.h], [f.teams.away.name + " to win", s.a], ["Over 1.5 goals", s.o15], ["GG", s.gg], ["Under 3.5 goals", 100 - s.o35], [f.teams.home.name + " or draw", s.dc1x], [f.teams.away.name + " or draw", s.dcx2]];
+      opts.sort((x, y) => y[1] - x[1]);
+      rows.push({f, label: opts[0][0], top: opts[0][1]});
+    }catch(e){ tb.textContent = "Could not load picks: " + e.message; return; }
+  }
+  rows.sort((a, b) => b.top - a.top);
+  const best = rows.slice(0, 5);
+  if(!best.length){ tb.textContent = "No predictions available yet."; return; }
+  tb.innerHTML = best.map(r => `<div class="tp" onclick="jumpTo(${r.f.fixture.id})">
+    <span><b>${r.f.teams.home.name} vs ${r.f.teams.away.name}</b><small>${r.label}</small></span>
+    <span class="pc">${r.top}%</span></div>`).join("");
+}
+function jumpTo(id){
+  const m = $("m" + id); if(!m) return;
+  if(!m.classList.contains("open")) openMatch(id);
+  m.scrollIntoView({behavior: "smooth", block: "center"});
 }
 
 if(CONFIG.SELAR_LINK){
-  const p=$("promo"); p.style.display="block";
-  p.innerHTML=`<b>From the creator of Football Predictions Picks</b><br><a href="${CONFIG.SELAR_LINK}" target="_blank" rel="noopener">${CONFIG.SELAR_TEXT}</a>`;
+  const p = $("promo"); p.style.display = "block";
+  p.innerHTML = `<b>From the creator of Football Predictions Picks</b><br><a href="${CONFIG.SELAR_LINK}" target="_blank" rel="noopener">${CONFIG.SELAR_TEXT}</a>`;
 }
 buildTabs(); load();
 </script>
