@@ -65,7 +65,7 @@ footer{color:var(--mute);font-size:12.5px;margin:26px 0}
   <div class="top" id="top">
     <h2>Top picks of the day</h2>
     <div id="topbody"><button class="go" onclick="loadTop()">Show top picks</button></div>
-    <small style="color:var(--mute)">Checks up to 15 matches (uses 15 API requests, saved after first load).</small>
+    <small style="color:var(--mute)">Checks matches from many leagues (uses up to 30 API requests, saved after first load).</small>
   </div>
 
   <div id="list">Loading matches...</div>
@@ -94,7 +94,7 @@ const CONFIG = {
   // Priority order: Premier League, Championship, La Liga, Serie A, Bundesliga, Ligue 1,
   // Champions League, Europa League, Conference League, Eredivisie, Primeira Liga, Super Lig,
   // Belgium, Scotland, Bundesliga 2, La Liga 2, Serie B, Ligue 2, League One, FA Cup
-  LEAGUES: [39,40,140,135,78,61,2,3,848,88,94,203,144,179,79,141,136,62,41,45]
+  LEAGUES: [39,40,2,3,848,140,135,78,61,88,94,203,144,179,218,207,119,89,95,204,219,208,120,121,79,141,136,62,41,42,45,113,103,106,197,200,201,169,170,188,399,329,330,331,345,346,347]
 };
 /* ================================================================== */
 
@@ -134,10 +134,13 @@ function xg(p){
   const la = (af && ha) ? (af + ha) / 2 : 1.1;
   return [Math.min(Math.max(lh, .3), 4), Math.min(Math.max(la, .3), 4)];
 }
-function pois(l){ const L = Math.exp(-l); let k = 0, p = 1; do{ k++; p *= Math.random(); }while(p > L); return k - 1; }
-const minute = () => Math.random() < .45 ? Math.random() * 45 : 45 + Math.random() * 45;
+let seed = 1;
+const rng = () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
+function pois(l){ const L = Math.exp(-l); let k = 0, p = 1; do{ k++; p *= rng(); }while(p > L); return k - 1; }
+const minute = () => rng() < .45 ? rng() * 45 : 45 + rng() * 45;
 
 function simulate(lh, la, N = 6000){
+  seed = Math.round(lh * 1000) * 7919 + Math.round(la * 1000) + 1;
   const c = {h:0,d:0,a:0,gg:0,o15:0,o25:0,o35:0,hh:0,ah:0,u1:0,u2:0,cs:{}};
   for(let i = 0; i < N; i++){
     const gh = pois(lh), ga = pois(la), ev = [];
@@ -226,10 +229,16 @@ async function openMatch(id){
 }
 
 /* ---------- free 5 odds slip ---------- */
+function poolFix(){
+  const n = {};
+  return FIX.filter(f => (n[f.league.id] = (n[f.league.id] || 0) + 1) <= 2).slice(0, 30);
+}
 async function loadAcca(){
-  const ab = $("accabody"); ab.textContent = "Building the slip...";
+  const ab = $("accabody"), key = "acca_" + ymd(day);
+  try{ const sv = localStorage.getItem(key); if(sv){ ab.innerHTML = sv; return; } }catch(e){}
+  ab.textContent = "Building the slip...";
   const cands = [];
-  for(const f of FIX.slice(0, 15)){
+  for(const f of poolFix()){
     try{
       const p = await getPred(f.fixture.id);
       if(!p || !p.teams) continue;
@@ -250,13 +259,14 @@ async function loadAcca(){
     + `<div class="tot"><span>Total odds</span><span style="color:var(--gold)">${odds.toFixed(2)}</span></div>
     <small style="color:var(--mute)">Estimated chance of all ${pick.length} winning: about ${Math.round(prob * 100)}%</small>`
     + (CONFIG.AFFILIATE_LINK ? `<a class="btn" href="${CONFIG.AFFILIATE_LINK}" target="_blank" rel="noopener sponsored">Place this slip</a>` : "");
+  try{ localStorage.setItem(key, ab.innerHTML); }catch(e){}
 }
 
 /* ---------- top picks ---------- */
 async function loadTop(){
   const tb = $("topbody"); tb.textContent = "Checking matches...";
   const rows = [];
-  for(const f of FIX.slice(0, 15)){
+  for(const f of poolFix().slice(0, 20)){
     try{
       const p = await getPred(f.fixture.id);
       if(!p || !p.teams) continue;
