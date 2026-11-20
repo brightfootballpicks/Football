@@ -42,6 +42,10 @@ h1{font-size:27px;margin:8px 0 0}h1 span{color:var(--gold)}
 .acca{background:linear-gradient(#16281f,#10301f);border:2px solid var(--green);border-radius:10px;padding:12px;margin-bottom:14px}
 .acca h2{margin:0 0 4px;font-size:20px;color:var(--green)}
 .acca .tot{display:flex;justify-content:space-between;font-weight:bold;padding-top:8px;border-top:1px solid var(--line);margin-top:4px}
+.hr{padding:8px 10px;border-radius:8px;margin-bottom:5px;background:var(--card);border:1px solid var(--line);font-size:14px}
+.hr small{display:block;color:var(--mute)}
+.hr.ok{border-color:#2ecc71;background:#10301f}.hr.ok b{color:#2ecc71}
+.hr.no{border-color:#e74c3c;background:#3a1616}.hr.no b{color:#ff5c5c}
 footer{color:var(--mute);font-size:12.5px;margin:26px 0}
 </style>
 </head>
@@ -70,6 +74,13 @@ footer{color:var(--mute);font-size:12.5px;margin:26px 0}
 
   <div id="list">Loading matches...</div>
 
+  <div class="top" id="hist" style="margin-top:14px">
+    <h2>Results history</h2>
+    <div id="histbody"></div>
+    <button class="go" style="margin-top:8px" onclick="checkHist()">Update results</button>
+    <small style="color:var(--mute)">Green tick = correct, red cross = failed. Saved on this phone.</small>
+  </div>
+
   <!-- MONEY SPOT 2: YOUR OWN PRODUCTS. Set SELAR_LINK below -->
   <div class="promo" id="promo" style="display:none"></div>
 
@@ -94,7 +105,7 @@ const CONFIG = {
   // Priority order: Premier League, Championship, La Liga, Serie A, Bundesliga, Ligue 1,
   // Champions League, Europa League, Conference League, Eredivisie, Primeira Liga, Super Lig,
   // Belgium, Scotland, Bundesliga 2, La Liga 2, Serie B, Ligue 2, League One, FA Cup
-  LEAGUES: [39,40,2,3,848,140,135,78,61,88,94,203,144,179,218,207,119,89,95,204,219,208,120,121,79,141,136,62,41,42,45,113,103,106,197,200,201,169,170,188,399,329,330,331,345,346,347]
+  LEAGUES: [39,40,2,3,848,140,135,78,61,88,94,203,144,179,218,207,119,89,95,204,219,208,120,121,79,141,136,62,41,42,45,113,103,106,197,200,201,169,170,188,399,329,330,331,345,346,347,368,233,262,210,261,340,253,110,278,389,271,274,211,307,308,305]
 };
 /* ================================================================== */
 
@@ -210,6 +221,7 @@ async function openMatch(id){
     if(!p || !p.teams) { d.textContent = "No prediction available for this match."; return; }
     const [lh, la] = xg(p), s = simulate(lh, la);
     const hn = p.teams.home.name, an = p.teams.away.name, bp = bestPick(p, s, lh, la);
+    rec(FIX.find(x => x.fixture.id === id), bp); renderHist();
     d.innerHTML = `
       <div class="bar"><div class="b1" style="width:${s.h}%">${s.h}%</div><div class="bx" style="width:${s.d}%">${s.d}%</div><div class="b2" style="width:${s.a}%">${s.a}%</div></div>
       <div class="lbl"><span>${hn} win</span><span>Draw</span><span>${an} win</span></div>
@@ -251,6 +263,61 @@ function bestPick(p, s, lh, la){
   b.conf = b[1] >= 70 ? "High" : b[1] >= 58 ? "Medium" : "Low";
   return b;
 }
+/* ---------- results history ---------- */
+function rec(f, b, key, s){
+  try{
+    const H = JSON.parse(localStorage.getItem("hist") || "{}"), k = key || f.fixture.id;
+    if(!H[k]) H[k] = {i: f.fixture.id, d: f.fixture.date.slice(0, 10), h: f.teams.home.name, a: f.teams.away.name, pk: b[0], pr: b[1], s: s || 0};
+    localStorage.setItem("hist", JSON.stringify(H));
+  }catch(e){}
+}
+function judge(r, gh, ga){
+  const p = r.pk, t = gh + ga;
+  if(p === r.h + " to win") return gh > ga;
+  if(p === r.a + " to win") return ga > gh;
+  if(p.includes("(1X)")) return gh >= ga;
+  if(p.includes("(X2)")) return ga >= gh;
+  if(p.startsWith("Over 1.5")) return t > 1;
+  if(p.startsWith("Over 2.5")) return t > 2;
+  if(p.startsWith("Under 3.5")) return t < 4;
+  if(p.startsWith("Under 2.5")) return t < 3;
+  if(p.startsWith("GG")) return gh > 0 && ga > 0;
+  return false;
+}
+async function checkHist(){
+  const hb = $("histbody"); hb.textContent = "Checking results...";
+  try{
+    const H = JSON.parse(localStorage.getItem("hist") || "{}"), today = ymd(0);
+    const dates = [...new Set(Object.values(H).filter(r => r.r === undefined && r.d <= today).map(r => r.d))].slice(0, 6);
+    for(const d of dates){
+      const fx = await api("/fixtures?date=" + d + "&timezone=" + CONFIG.TIMEZONE), M = {};
+      fx.forEach(f => M[f.fixture.id] = f);
+      Object.values(H).forEach(r => {
+        const f = M[r.i];
+        if(r.d === d && f && ["FT", "AET", "PEN"].includes(f.fixture.status.short)){
+          r.r = judge(r, f.goals.home, f.goals.away) ? 1 : 0; r.sc = f.goals.home + "-" + f.goals.away;
+        }
+      });
+    }
+    localStorage.setItem("hist", JSON.stringify(H));
+  }catch(e){ hb.textContent = "Could not check results: " + e.message; return; }
+  renderHist();
+}
+function renderHist(){
+  let H = {}; try{ H = JSON.parse(localStorage.getItem("hist") || "{}"); }catch(e){}
+  const rows = Object.values(H);
+  if(!rows.length){ $("histbody").textContent = "No picks saved yet. Open a match or tap the 5 odds button first."; return; }
+  const by = {}; rows.forEach(r => (by[r.d] = by[r.d] || []).push(r));
+  const done = rows.filter(r => r.r !== undefined), win = done.filter(r => r.r).length;
+  let html = `<div style="display:flex;justify-content:space-between;font-weight:bold;margin-bottom:6px"><span>Overall record</span><span style="color:var(--gold)">${win}/${done.length}${done.length ? " (" + Math.round(100 * win / done.length) + "%)" : ""}</span></div>`;
+  Object.keys(by).sort().reverse().slice(0, 7).forEach(d => {
+    const L = by[d], dd = L.filter(r => r.r !== undefined), w = dd.filter(r => r.r).length;
+    html += `<div class="league">${d} - ${w}/${dd.length} correct</div>` + L.map(r =>
+      `<div class="hr ${r.r === undefined ? "" : r.r ? "ok" : "no"}"><b>${r.r === undefined ? "..." : r.r ? "✔" : "✘"}</b> ${r.s ? "[5 ODDS] " : ""}${r.h} vs ${r.a}<small>${r.pk}${r.sc ? " | Result " + r.sc : ""}</small></div>`).join("");
+  });
+  $("histbody").innerHTML = html;
+}
+
 function poolFix(){
   const n = {};
   return FIX.filter(f => (n[f.league.id] = (n[f.league.id] || 0) + 1) <= 2).slice(0, 30);
@@ -265,6 +332,7 @@ async function loadAcca(){
       const p = await getPred(f.fixture.id);
       if(!p || !p.teams) continue;
       const [lh, la] = xg(p), s = simulate(lh, la, 3000);
+      rec(f, bestPick(p, s, lh, la));
       const opts = pickList(p, s, lh, la).filter(o => o[1] >= 60 && o[1] <= 83);
       if(opts.length) cands.push({f, label: opts[0][0], p: opts[0][1], why: opts[0][2]});
     }catch(e){ ab.textContent = "Could not build the slip: " + e.message; return; }
@@ -273,6 +341,7 @@ async function loadAcca(){
   const pick = []; let odds = 1, prob = 1;
   for(const c of cands){ if(odds >= 5) break; pick.push(c); odds *= 100 / c.p; prob *= c.p / 100; }
   if(!pick.length){ ab.textContent = "Not enough strong picks for this day. Try another day."; return; }
+  pick.forEach(c => rec(c.f, [c.label, c.p], "s" + c.f.fixture.id, 1)); renderHist();
   ab.innerHTML = pick.map(c => `<div class="tp" onclick="jumpTo(${c.f.fixture.id})">
     <span><b>${c.f.teams.home.name} vs ${c.f.teams.away.name}</b><small><b style="color:var(--gold)">${c.label}</b> - ${c.p >= 70 ? "High" : "Medium"} confidence (${c.p}%)<br>${c.why}</small></span>
     <span class="pc">${(100 / c.p).toFixed(2)}</span></div>`).join("")
@@ -313,7 +382,7 @@ if(CONFIG.SELAR_LINK){
   const p = $("promo"); p.style.display = "block";
   p.innerHTML = `<b>From the creator of Football Predictions Picks</b><br><a href="${CONFIG.SELAR_LINK}" target="_blank" rel="noopener">${CONFIG.SELAR_TEXT}</a>`;
 }
-buildTabs(); load();
+buildTabs(); load(); renderHist();
 </script>
 <script data-goatcounter="https://footballpicks.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
