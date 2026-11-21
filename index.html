@@ -340,4 +340,55 @@ async function loadAcca(){
   }
   cands.sort((a, b) => b.p - a.p);
   const pick = []; let odds = 1, prob = 1;
-  for(const c of cands){ if(odds >= 5) break; 
+  for(const c of cands){ if(odds >= 5) break; pick.push(c); odds *= 100 / c.p; prob *= c.p / 100; }
+  if(!pick.length){ ab.textContent = "Not enough strong picks for this day. Try another day."; return; }
+  pick.forEach(c => rec(c.f, [c.label, c.p], "s" + c.f.fixture.id, 1)); renderHist();
+  ab.innerHTML = pick.map(c => `<div class="tp" onclick="jumpTo(${c.f.fixture.id})">
+    <span><b>${c.f.teams.home.name} vs ${c.f.teams.away.name}</b><small><b style="color:var(--gold)">${c.label}</b> - ${c.p >= 70 ? "High" : "Medium"} confidence (${c.p}%)<br>${c.why}</small></span>
+    <span class="pc">${(100 / c.p).toFixed(2)}</span></div>`).join("")
+    + `<div class="tot"><span>Total odds</span><span style="color:var(--gold)">${odds.toFixed(2)}</span></div>
+    <small style="color:var(--mute)">Estimated chance of all ${pick.length} winning: about ${Math.round(prob * 100)}%</small>`
+    + (CONFIG.AFFILIATE_LINK ? `<a class="btn" href="${CONFIG.AFFILIATE_LINK}" target="_blank" rel="noopener sponsored">Place this slip on Betway</a>` : "");
+  try{ localStorage.setItem(key, ab.innerHTML); }catch(e){}
+}
+
+/* ---------- top picks ---------- */
+async function loadTop(){
+  const tb = $("topbody"); tb.textContent = "Checking matches...";
+  const rows = [];
+  for(const f of poolFix().slice(0, 20)){
+    try{
+      const p = await getPred(f.fixture.id);
+      if(!p || !p.teams) continue;
+      const [lh, la] = xg(p), s = simulate(lh, la, 3000);
+      const opts = [[f.teams.home.name + " to win", s.h], [f.teams.away.name + " to win", s.a], ["Over 1.5 goals", s.o15], ["GG", s.gg], ["Under 3.5 goals", 100 - s.o35], [f.teams.home.name + " or draw", s.dc1x], [f.teams.away.name + " or draw", s.dcx2]];
+      opts.sort((x, y) => y[1] - x[1]);
+      rows.push({f, label: opts[0][0], top: opts[0][1]});
+    }catch(e){ tb.textContent = "Could not load picks: " + e.message; return; }
+  }
+  rows.sort((a, b) => b.top - a.top);
+  const best = rows.slice(0, 5);
+  if(!best.length){ tb.textContent = "No predictions available yet."; return; }
+  tb.innerHTML = best.map(r => `<div class="tp" onclick="jumpTo(${r.f.fixture.id})">
+    <span><b>${r.f.teams.home.name} vs ${r.f.teams.away.name}</b><small>${r.label}</small></span>
+    <span class="pc">${r.top}%</span></div>`).join("");
+}
+function jumpTo(id){
+  const m = $("m" + id); if(!m) return;
+  if(!m.classList.contains("open")) openMatch(id);
+  m.scrollIntoView({behavior: "smooth", block: "center"});
+}
+
+if(CONFIG.SELAR_LINK){
+  const p = $("promo"); p.style.display = "block";
+  p.innerHTML = `<b>From the creator of Football Predictions Picks</b><br><a href="${CONFIG.SELAR_LINK}" target="_blank" rel="noopener">${CONFIG.SELAR_TEXT}</a>`;
+}
+if(CONFIG.AFFILIATE_LINK){
+  const b = $("bw"); b.style.display = "block";
+  b.innerHTML = `<b>Ready to bet on today's picks?</b><br><small style="color:var(--mute)">18+ only. Bet responsibly.</small><a class="btn" href="${CONFIG.AFFILIATE_LINK}" target="_blank" rel="noopener sponsored">${CONFIG.AFFILIATE_NAME}</a>`;
+}
+buildTabs(); load(); renderHist();
+</script>
+<script data-goatcounter="https://footballpicks.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
