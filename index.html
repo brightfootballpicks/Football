@@ -46,6 +46,7 @@ h1{font-size:27px;margin:8px 0 0}h1 span{color:var(--gold)}
 .hr small{display:block;color:var(--mute)}
 .hr.ok{border-color:#2ecc71;background:#10301f}.hr.ok b{color:#2ecc71}
 .hr.no{border-color:#e74c3c;background:#3a1616}.hr.no b{color:#ff5c5c}
+.promo a.btn{color:#1a1a1a}
 footer{color:var(--mute);font-size:12.5px;margin:26px 0}
 </style>
 </head>
@@ -385,7 +386,11 @@ if(CONFIG.SELAR_LINK){
 }
 if(CONFIG.AFFILIATE_LINK){
   const b = $("bw"); b.style.display = "block";
-  b.innerHTML = `<b>Ready to bet on today's picks?</b><br><small style="color:var(--mute)">18+ only. Bet responsibly.</small><a class="btn" href="${CONFIG.AFFILIATE_LINK}" target="_blank" rel="noopener sponsored">${CONFIG.AFFILIATE_NAME}</a>`;
+  b.innerHTML = `<div style="font-size:11px;color:var(--mute);text-align:left">ADVERT</div>
+    <div style="display:inline-block;background:#00a826;color:#fff;font-weight:bold;font-size:24px;padding:4px 18px;border-radius:6px;margin:6px 0">Betway</div>
+    <div style="font-weight:bold">Bet on today's matches with Betway Nigeria</div>
+    <a class="btn" href="${CONFIG.AFFILIATE_LINK}" target="_blank" rel="noopener sponsored">${CONFIG.AFFILIATE_NAME}</a>
+    <small style="color:var(--mute)">Advert for Betway Nigeria. 18+ only. T&amp;Cs apply. Bet responsibly.</small>`;
 }
 buildTabs(); load(); renderHist();
 </script>
