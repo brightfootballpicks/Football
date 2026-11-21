@@ -90,6 +90,7 @@ footer{color:var(--mute);font-size:12.5px;margin:26px 0}
   <footer>
     Football Predictions Picks. Predictions are statistical estimates, not guarantees.
     Only 18+. Bet with money you can afford to lose.
+    Some links on this site are affiliate links. We may earn a commission if you sign up, at no extra cost to you.
   </footer>
 </div>
 
@@ -97,8 +98,8 @@ footer{color:var(--mute);font-size:12.5px;margin:26px 0}
 /* ======== SETTINGS: this is the only part you need to edit ======== */
 const CONFIG = {
   API_KEY: "8b26b15fc4c15d87694685e8c9c3a2c7",
-  AFFILIATE_LINK: "",   // paste your bookmaker affiliate link
-  AFFILIATE_NAME: "Bet on this match",
+  AFFILIATE_LINK: "https://www.betway.com.ng/betwayjackpots/?btag=P120239-PR27146-CM92516-TS2180448",   // Betway affiliate link
+  AFFILIATE_NAME: "Bet on Betway",
   SELAR_LINK: "",       // paste a link to your Selar store
   SELAR_TEXT: "Get my free guide and ebooks on Selar",
   TIMEZONE: "Africa/Lagos",
@@ -347,7 +348,7 @@ async function loadAcca(){
     <span class="pc">${(100 / c.p).toFixed(2)}</span></div>`).join("")
     + `<div class="tot"><span>Total odds</span><span style="color:var(--gold)">${odds.toFixed(2)}</span></div>
     <small style="color:var(--mute)">Estimated chance of all ${pick.length} winning: about ${Math.round(prob * 100)}%</small>`
-    + (CONFIG.AFFILIATE_LINK ? `<a class="btn" href="${CONFIG.AFFILIATE_LINK}" target="_blank" rel="noopener sponsored">Place this slip</a>` : "");
+    + (CONFIG.AFFILIATE_LINK ? `<a class="btn" href="${CONFIG.AFFILIATE_LINK}" target="_blank" rel="noopener sponsored">Place this slip on Betway</a>` : "");
   try{ localStorage.setItem(key, ab.innerHTML); }catch(e){}
 }
 
